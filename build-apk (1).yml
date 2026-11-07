@@ -1,51 +1,27 @@
 name: Build ChatNote APK
-
 on:
   workflow_dispatch:
   push:
-    paths:
-      - "ChatNote.zip"
-
+    paths: ["ChatNote.zip"]
 permissions:
-  contents: write   # needed to publish the APK as a release
-
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Unzip project
-        run: |
-          unzip -q ChatNote.zip -d src_project
-          ls src_project
-
+      - run: unzip -q ChatNote.zip -d src_project
       - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
+        with: { distribution: temurin, java-version: 17 }
       - uses: android-actions/setup-android@v3
-
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.7
-
+        with: { gradle-version: 8.7 }
       - name: Build debug APK
         working-directory: src_project/ChatNote
         run: gradle :app:assembleDebug --no-daemon
-
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ChatNote-debug
-          path: src_project/ChatNote/app/build/outputs/apk/debug/app-debug.apk
-
-      - name: Publish APK as a release (direct download on phone)
+      - name: Publish APK release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp src_project/ChatNote/app/build/outputs/apk/debug/app-debug.apk ChatNote.apk
-          gh release create "build-${{ github.run_number }}" ChatNote.apk \
-            --title "ChatNote build ${{ github.run_number }}" \
-            --notes "Debug APK built from ChatNote.zip"
+          gh release create "build-${{ github.run_number }}" ChatNote.apk --title "ChatNote build ${{ github.run_number }}" --notes "Debug APK"
