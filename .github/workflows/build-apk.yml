@@ -15,6 +15,8 @@ jobs:
           echo "Using $ZIP"
           unzip -q "$ZIP" -d src_project
           DIR=$(dirname "$(find src_project -name settings.gradle.kts | head -n1)")
+
+        
           echo "PROJECT_DIR=$DIR" >> $GITHUB_ENV
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
