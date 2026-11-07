@@ -18,7 +18,11 @@ jobs:
           echo "PROJECT_DIR=$DIR" >> $GITHUB_ENV
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: 17 }
-      - uses: android-actions/setup-android@v3
+      - name: Accept SDK licenses and install platform
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" "platforms;android-34" "build-tools;34.0.0"
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: 8.7 }
       - name: Build debug APK
