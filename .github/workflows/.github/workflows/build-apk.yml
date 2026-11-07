@@ -1,8 +1,10 @@
+test -f ChatNote.zip || { echo "ChatNote.zip is missing. Add it to this folder first."; exit 1; }
+rm -rf .github/workflows && mkdir -p .github/workflows
+cat > .github/workflows/build-apk.yml <<'EOF'
 name: Build ChatNote APK
 on:
   workflow_dispatch:
   push:
-    paths: ["ChatNote.zip"]
 permissions:
   contents: write
 jobs:
@@ -25,3 +27,5 @@ jobs:
         run: |
           cp src_project/ChatNote/app/build/outputs/apk/debug/app-debug.apk ChatNote.apk
           gh release create "build-${{ github.run_number }}" ChatNote.apk --title "ChatNote build ${{ github.run_number }}" --notes "Debug APK"
+EOF
+git add -A && git commit -m "Fresh APK workflow" && git push
